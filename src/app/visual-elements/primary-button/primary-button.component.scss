@@ -1,0 +1,18 @@
+.mat-main {
+  background-color: #f5ce45;
+  color: #352900;
+  font-weight: bold;
+  margin: 5px;
+}
+
+.mat-secondary {
+  background-color: rgba($color: #f2f2f2, $alpha: 0.2);
+  color: #f2f2f2;
+  font-weight: bold;
+  margin: 5px;
+  border: 2px solid rgba($color: #f2f2f2, $alpha: 0.3);
+}
+
+.extended-button {
+  width: 100%;
+}

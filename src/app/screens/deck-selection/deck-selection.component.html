@@ -1,0 +1,15 @@
+<div class="decks-list">
+  <div class="deck" *ngFor="let preview of decksPreviews">
+    <div class="deck-presentation">
+      <img [src]="preview" alt="" />
+    </div>
+    <div class="button-container">
+      <primary-button
+        class="btn long-btn"
+        name="ВЫБРАТЬ"
+        [extended]="true"
+        routerLink="/newgame"
+      ></primary-button>
+    </div>
+  </div>
+</div>

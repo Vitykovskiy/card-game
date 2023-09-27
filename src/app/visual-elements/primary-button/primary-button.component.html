@@ -1,0 +1,9 @@
+<button
+  mat-fab
+  [extended]="extended"
+  [color]="color"
+  [ngClass]="extended ? 'extended-button' : ''"
+>
+  {{ name }}
+  <mat-icon *ngIf="icon" [fontIcon]="icon" />
+</button>

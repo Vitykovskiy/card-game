@@ -1,0 +1,24 @@
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+
+  color: white;
+  font-size: 2rem;
+}
+
+.settings-row-left {
+  flex: 1;
+}
+
+.settings-row-right {
+  flex: 1;
+}

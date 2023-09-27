@@ -1,0 +1,19 @@
+.tool-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 90%;
+
+  font-size: 4rem;
+  font-weight: bold;
+  color: white;
+}
+
+.title {
+  flex: 3;
+}
+
+.btn-container {
+  flex: 1;
+}
