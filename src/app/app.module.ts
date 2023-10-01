@@ -8,6 +8,7 @@ import { StartScreenComponent } from './screens/start-screen/start-screen.compon
 import { RoomSettingsComponent } from './screens/room-settings/room-settings.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { VisualElementsModule } from './visual-elements/visual-elements.module';
+import { HttpClientModule } from '@angular/common/http';
 
 const appRoutes: Routes = [
   { path: '', component: StartScreenComponent },
@@ -27,6 +28,7 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes),
     BrowserAnimationsModule,
     VisualElementsModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

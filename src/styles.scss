@@ -35,8 +35,7 @@ $project-theme: mat.define-light-theme(
 @include mat.all-component-themes($project-theme);
 
 body {
-  background: linear-gradient(to bottom, #362771 0%, #2d2666 50%, #1e2454 100%);
-  background-attachment: fixed;
+  background: radial-gradient(100% 100% at 50% 0%, #4e2a8e 0%, #1e2454 100%);
 }
 html,
 body {

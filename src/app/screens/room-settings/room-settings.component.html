@@ -12,6 +12,15 @@
     </div>
   </div>
   <div class="settings-row">
-    <primary-button [extended]="true" name="СОЗДАТЬ" />
+    <primary-button
+      [extended]="true"
+      (click)="createPlayer()"
+      name="СОЗДАТЬ ИГРОКА"
+    />
+    <primary-button
+      [extended]="true"
+      (click)="createGame()"
+      name="СОЗДАТЬ ИГРУ"
+    />
   </div>
 </div>

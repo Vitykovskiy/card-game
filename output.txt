@@ -1,0 +1,693 @@
+/* app-routing.module.ts */
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
+
+
+/* app.component.html */
+
+<div class="content-container">
+  <div class="title-container">
+    <tool-panel *ngIf="true" name="Настройки комнаты"></tool-panel>
+  </div>
+  <div class="content-wrapper">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+
+/* app.component.ts */
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+})
+export class AppComponent {
+  title = 'project';
+}
+
+
+/* app.module.ts */
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule, Routes } from '@angular/router';
+
+import { AppComponent } from './app.component';
+import { DeckSelectionComponent } from './screens/deck-selection/deck-selection.component';
+import { StartScreenComponent } from './screens/start-screen/start-screen.component';
+import { RoomSettingsComponent } from './screens/room-settings/room-settings.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { VisualElementsModule } from './visual-elements/visual-elements.module';
+import { HttpClientModule } from '@angular/common/http';
+
+const appRoutes: Routes = [
+  { path: '', component: StartScreenComponent },
+  { path: 'deckselection', component: DeckSelectionComponent },
+  { path: 'newgame', component: RoomSettingsComponent },
+];
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    StartScreenComponent,
+    DeckSelectionComponent,
+    RoomSettingsComponent,
+  ],
+  imports: [
+    BrowserModule,
+    RouterModule.forRoot(appRoutes),
+    BrowserAnimationsModule,
+    VisualElementsModule,
+    HttpClientModule,
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+
+
+/* deck-selection.component.html */
+
+<div class="decks-list">
+  <div class="deck" *ngFor="let preview of decksPreviews">
+    <div class="deck-presentation">
+      <img [src]="preview" alt="" />
+    </div>
+    <div class="button-container">
+      <primary-button
+        class="btn long-btn"
+        name="ВЫБРАТЬ"
+        [extended]="true"
+        routerLink="/newgame"
+      ></primary-button>
+    </div>
+  </div>
+</div>
+
+
+/* deck-selection.component.ts */
+
+import { Component, OnInit } from '@angular/core';
+import {
+  StateManagerService,
+  GameStates,
+} from 'src/app/services/state-manager.service';
+
+@Component({
+  selector: 'deck-selection',
+  templateUrl: './deck-selection.component.html',
+  styleUrls: ['./deck-selection.component.scss'],
+})
+export class DeckSelectionComponent implements OnInit {
+  public decksPreviews: string[] = [
+    'card-example-1.JPG',
+    'card-example-2.JPG',
+    'card-example-3.JPG',
+  ];
+  public pathToImages = '../assets/images/';
+
+  constructor(private stateManagerService: StateManagerService) {}
+
+  ngOnInit() {
+    this.stateManagerService.setState(GameStates.DeckSelection);
+    this.decksPreviews = this.decksPreviews.map(
+      (path: string) => this.pathToImages + path,
+    );
+  }
+}
+
+
+/* game-results.component.html */
+
+<p>game-results works!</p>
+
+
+/* game-results.component.ts */
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'game-results',
+  templateUrl: './game-results.component.html',
+  styleUrls: ['./game-results.component.scss'],
+})
+export class GameResultsComponent {}
+
+
+/* game-table.component.html */
+
+<p>game-table works!</p>
+
+
+/* game-table.component.ts */
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'game-table',
+  templateUrl: './game-table.component.html',
+  styleUrls: ['./game-table.component.scss'],
+})
+export class GameTableComponent {}
+
+
+/* player-cards-screen.component.html */
+
+<p>player-cards-screen works!</p>
+
+
+/* player-cards-screen.component.ts */
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'player-cards-screen',
+  templateUrl: './player-cards-screen.component.html',
+  styleUrls: ['./player-cards-screen.component.scss'],
+})
+export class PlayerCardsScreenComponent {}
+
+
+/* room-settings.component.html */
+
+<div class="settings-wrapper">
+  <div class="settings-row">
+    <div class="settings-row-left">Количество игроков</div>
+    <div class="settings-row-right">
+      <numeric-input />
+    </div>
+  </div>
+  <div class="settings-row">
+    <div class="settings-row-left">Очков для победы</div>
+    <div class="settings-row-right">
+      <numeric-input />
+    </div>
+  </div>
+  <div class="settings-row">
+    <primary-button [extended]="true" (click)="createGame()" name="СОЗДАТЬ" />
+  </div>
+</div>
+
+
+/* room-settings.component.ts */
+
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Status } from 'src/app/services/interfaces';
+import { RequestService } from 'src/app/services/request.service';
+import {
+  StateManagerService,
+  GameStates,
+} from 'src/app/services/state-manager.service';
+
+@Component({
+  selector: 'room-settings',
+  templateUrl: './room-settings.component.html',
+  styleUrls: ['./room-settings.component.scss'],
+})
+export class RoomSettingsComponent implements OnInit {
+  constructor(
+    private _stateManagerService: StateManagerService,
+    private _requestService: RequestService,
+  ) {}
+  ngOnInit() {
+    this._stateManagerService.setState(GameStates.RoomSettings);
+  }
+
+  createGame(): void {
+    this._requestService
+      .createGame({
+        creator: 1,
+        deck: 1,
+        members_num: 4,
+        points_to_win: 40,
+      })
+      .subscribe((data) => {
+        console.log('DATA!:', data);
+      });
+  }
+}
+
+
+/* start-screen.component.html */
+
+<div class="screen-container">
+  <h1 class="header">Очевидно и точка</h1>
+  <h2 class="sub-header">Карточная игра с использованием нейросети</h2>
+  <div class="menu-buttons-container">
+    <div class="menu-buttons-row">
+      <primary-button
+        class="btn long-btn"
+        name="СОЗДАТЬ ИГРУ"
+        routerLink="/deckselection"
+        [extended]="true"
+      ></primary-button>
+    </div>
+    <div class="menu-buttons-row">
+      <primary-button
+        class="btn long-btn"
+        name="ПОДКЛЮЧИТЬСЯ К ИГРЕ"
+        [extended]="true"
+      ></primary-button>
+    </div>
+    <div class="menu-buttons-row">
+      <primary-button
+        class="btn long-btn"
+        name="ПОДЕЛИТЬСЯ"
+        [extended]="true"
+        icon="launch"
+        color="secondary"
+      ></primary-button>
+      <primary-button
+        class="btn"
+        icon="launch"
+        color="secondary"
+      ></primary-button>
+      <primary-button
+        class="btn"
+        icon="launch"
+        color="secondary"
+      ></primary-button>
+    </div>
+  </div>
+</div>
+
+
+/* start-screen.component.ts */
+
+import { Component, OnInit } from '@angular/core';
+import {
+  GameStates,
+  StateManagerService,
+} from 'src/app/services/state-manager.service';
+
+@Component({
+  selector: 'start-screen',
+  templateUrl: './start-screen.component.html',
+  styleUrls: ['./start-screen.component.scss'],
+})
+export class StartScreenComponent implements OnInit {
+  constructor(private stateManagerService: StateManagerService) {}
+
+  ngOnInit() {
+    this.stateManagerService.setState(GameStates.Start);
+  }
+}
+
+
+/* waiting-room.component.html */
+
+<p>waiting-room works!</p>
+
+
+/* waiting-room.component.ts */
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'waiting-room',
+  templateUrl: './waiting-room.component.html',
+  styleUrls: ['./waiting-room.component.scss'],
+})
+export class WaitingRoomComponent {}
+
+
+/* interfaces.ts */
+
+interface ICreateGameRequestDTO {
+  creator: number;
+  deck: number;
+  members_num: number;
+  points_to_win: number;
+  status?: Status;
+}
+
+interface ICreateGameResponseDTO {
+  gameID: string;
+  creator: number;
+  deck: string;
+  members_num: number;
+  points_to_win: number;
+  status?: Status;
+}
+
+interface IJoinGameRequestDTO {
+  gameId: string;
+}
+
+interface IJoinGameResponseDTO {
+  memberID: string;
+  avatar: string;
+  color: string;
+}
+
+interface IPlayer {
+  memberId: string;
+  avatar: string;
+  ready: boolean;
+}
+
+interface IPlayers {
+  members: IPlayer[];
+}
+
+enum Status {
+  WT = 'Waiting',
+  PL = 'Playing',
+  FN = 'Finished',
+}
+
+export {
+  ICreateGameRequestDTO,
+  ICreateGameResponseDTO,
+  IJoinGameRequestDTO,
+  IJoinGameResponseDTO,
+  Status,
+  IPlayers,
+};
+
+
+/* request.service.ts */
+
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { filter, map, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { ICreateGameRequestDTO } from './interfaces';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class RequestService {
+  private url = 'http://localhost:8000';
+  private socket$: WebSocketSubject<any> | undefined;
+
+  constructor(private http: HttpClient) {}
+
+  connect() {
+    if (!this.socket$) {
+      this.socket$ = webSocket('ws://localhost:8000');
+    }
+  }
+
+  disconnect() {
+    if (!this.socket$) {
+      return;
+    }
+    this.socket$.complete();
+  }
+
+  listenToServerEvent(eventName: string) {
+    if (!this.socket$) {
+      return;
+    }
+    return this.socket$.asObservable().pipe(
+      filter((message) => message.event === eventName),
+      map((message) => message.data),
+    );
+  }
+
+  emitEvent(eventName: string, data: any) {
+    if (!this.socket$) {
+      return;
+    }
+    const message = { event: eventName, data };
+    this.socket$.next(message);
+  }
+
+  get(endpoint: string) {
+    return this.http.get(`${this.url}/${endpoint}`);
+  }
+
+  post(endpoint: string, body: any) {
+    return this.http.post(`${this.url}/${endpoint}`, body);
+  }
+
+  put(endpoint: string, body: any) {
+    return this.http.put(`${this.url}/${endpoint}`, body);
+  }
+  createGame(newGameOptions: ICreateGameRequestDTO): Observable<any> {
+    return this.post('api/game/create/', newGameOptions);
+  }
+}
+
+
+/* state-manager.service.ts */
+
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+export enum GameStates {
+  Start = 'start',
+  DeckSelection = 'deck-selection',
+  RoomSettings = 'room-settings',
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class StateManagerService {
+  public currentState: Observable<string | null>;
+  private _stateSource: BehaviorSubject<string | null>;
+  private _currentDeck: BehaviorSubject<string | null>;
+  private _roomId: BehaviorSubject<string | null>;
+  private _userId: string | undefined;
+
+  constructor() {
+    this._stateSource = new BehaviorSubject<string | null>(null);
+    this._currentDeck = new BehaviorSubject<string | null>(null);
+    this._roomId = new BehaviorSubject<string | null>(null);
+    this.currentState = this._stateSource.asObservable();
+  }
+
+  setState(state: string) {
+    this._stateSource.next(state);
+  }
+
+  setCurrentDeck(deckId: string) {}
+}
+
+
+/* numeric-input.component.html */
+
+<div class="numeric-input-container">
+  <primary-button color="secondary" icon="remove" (click)="decrease()" />
+  {{ counter }}
+  <primary-button color="secondary" icon="add" (click)="increase()" />
+</div>
+
+
+/* numeric-input.component.ts */
+
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'numeric-input',
+  templateUrl: './numeric-input.component.html',
+  styleUrls: ['./numeric-input.component.scss'],
+})
+export class NumericInputComponent {
+  @Input() counter: number = 0;
+
+  public increase(): void {
+    this.counter++;
+  }
+
+  public decrease(): void {
+    if (this.counter > 0) {
+      this.counter--;
+    }
+  }
+}
+
+
+/* tool-panel.component.html */
+
+<div class="tool-panel">
+  <div class="title">{{ currentState | async }}</div>
+  <div class="btn-container">
+    <primary-button
+      (click)="goBack()"
+      color="secondary"
+      icon="undo"
+    ></primary-button>
+  </div>
+</div>
+
+
+/* tool-panel.component.ts */
+
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { StateManagerService } from 'src/app/services/state-manager.service';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'tool-panel',
+  templateUrl: './tool-panel.component.html',
+  styleUrls: ['./tool-panel.component.scss'],
+})
+export class ToolPanelComponent {
+  constructor(
+    private router: Router,
+    private location: Location,
+    private stateManagerService: StateManagerService,
+  ) {}
+
+  get currentState(): Observable<string | null> {
+    return this.stateManagerService.currentState;
+  }
+
+  goBack() {
+    this.location.back();
+  }
+}
+
+
+/* user-icon.component.html */
+
+<p>user-icon works!</p>
+
+
+/* user-icon.component.ts */
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'user-icon',
+  templateUrl: './user-icon.component.html',
+  styleUrls: ['./user-icon.component.scss'],
+})
+export class UserIconComponent {}
+
+
+/* primary-button.component.html */
+
+<button
+  mat-fab
+  [extended]="extended"
+  [color]="color"
+  [ngClass]="extended ? 'extended-button' : ''"
+>
+  {{ name }}
+  <mat-icon *ngIf="icon" [fontIcon]="icon" />
+</button>
+
+
+/* primary-button.component.ts */
+
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'primary-button',
+  templateUrl: './primary-button.component.html',
+  styleUrls: ['./primary-button.component.scss'],
+})
+export class PrimaryButtonComponent {
+  @Input() name: string | undefined;
+  @Input() icon: string | undefined;
+  @Input() extended: boolean = false;
+  @Input() color: 'main' | 'secondary' = 'main';
+  @Input() scale: number = 1;
+
+  buttonContainerStyle(): { [key: string]: string } {
+    return {
+      width: this.extended ? '100%' : `${50 * this.scale}px`, // Здесь можно задать свою размерность ширины контейнера
+      height: `${50 * this.scale}px`, // Здесь можно задать свою размерность ширины контейнера
+    };
+  }
+
+  buttonStyle(): { [key: string]: string } {
+    const options = {
+      transform: `scale(${this.scale})`,
+    } as any;
+    if (this.extended) {
+      options.width = `${100 * this.scale}%`;
+    }
+    return options;
+  }
+
+  ngOnInit() {}
+}
+
+
+/* visual-elements.module.ts */
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { PrimaryButtonComponent } from './primary-button/primary-button.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { NumericInputComponent } from '../ui-components/numeric-input/numeric-input.component';
+import { UserIconComponent } from '../ui-components/user-icon/user-icon.component';
+import { ToolPanelComponent } from '../ui-components/tool-panel/tool-panel.component';
+
+@NgModule({
+  declarations: [
+    PrimaryButtonComponent,
+    NumericInputComponent,
+    UserIconComponent,
+    ToolPanelComponent,
+  ],
+  imports: [CommonModule, MatButtonModule, MatTooltipModule, MatIconModule],
+  exports: [
+    PrimaryButtonComponent,
+    NumericInputComponent,
+    UserIconComponent,
+    ToolPanelComponent,
+  ],
+})
+export class VisualElementsModule {}
+
+
+/* index.html */
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Очевидно и точка</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="mat-typography">
+    <app-root></app-root>
+  </body>
+</html>
+
+
+/* main.ts */
+
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+import { AppModule } from './app/app.module';
+
+platformBrowserDynamic()
+  .bootstrapModule(AppModule)
+  .catch((err) => console.error(err));
+
+
