@@ -9,11 +9,19 @@ import { RoomSettingsComponent } from './screens/room-settings/room-settings.com
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { VisualElementsModule } from './visual-elements/visual-elements.module';
 import { HttpClientModule } from '@angular/common/http';
+import { JoinGameComponent } from './screens/join-game/join-game.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { WaitingRoomComponent } from './screens/waiting-room/waiting-room.component';
+import { GameRoomComponent } from './screens/game-room/game-room.component';
+import { CardComponent } from './ui-components/card/card.component';
 
 const appRoutes: Routes = [
   { path: '', component: StartScreenComponent },
   { path: 'deckselection', component: DeckSelectionComponent },
   { path: 'newgame', component: RoomSettingsComponent },
+  { path: 'joingame', component: JoinGameComponent },
+  { path: 'waiting', component: WaitingRoomComponent },
+  { path: 'game', component: GameRoomComponent },
 ];
 
 @NgModule({
@@ -22,6 +30,10 @@ const appRoutes: Routes = [
     StartScreenComponent,
     DeckSelectionComponent,
     RoomSettingsComponent,
+    JoinGameComponent,
+    WaitingRoomComponent,
+    GameRoomComponent,
+    CardComponent,
   ],
   imports: [
     BrowserModule,
@@ -29,6 +41,8 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     VisualElementsModule,
     HttpClientModule,
+    BrowserModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

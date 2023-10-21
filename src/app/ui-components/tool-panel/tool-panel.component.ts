@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { StateManagerService } from 'src/app/services/state-manager.service';
+import { GameStateManagerService } from 'src/app/services/game-state-manager.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -11,13 +11,12 @@ import { Observable } from 'rxjs';
 })
 export class ToolPanelComponent {
   constructor(
-    private router: Router,
     private location: Location,
-    private stateManagerService: StateManagerService,
+    private _gameStateManagerService: GameStateManagerService,
   ) {}
 
   get currentState(): Observable<string | null> {
-    return this.stateManagerService.currentState;
+    return this._gameStateManagerService.currentState;
   }
 
   goBack() {

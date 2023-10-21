@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {
   GameStates,
-  StateManagerService,
-} from 'src/app/services/state-manager.service';
+  GameStateManagerService,
+} from 'src/app/services/game-state-manager.service';
 
 @Component({
   selector: 'start-screen',
@@ -10,9 +10,9 @@ import {
   styleUrls: ['./start-screen.component.scss'],
 })
 export class StartScreenComponent implements OnInit {
-  constructor(private stateManagerService: StateManagerService) {}
+  constructor(private _gameStateManagerService: GameStateManagerService) {}
 
   ngOnInit() {
-    this.stateManagerService.setState(GameStates.Start);
+    this._gameStateManagerService.setState(GameStates.Start);
   }
 }

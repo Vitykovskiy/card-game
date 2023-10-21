@@ -1,0 +1,55 @@
+.avatar {
+  position: relative;
+  width: 100px; /* Здесь вы можете установить требуемую ширину и высоту аватара */
+  height: 100px;
+}
+
+.avatar-icon {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px; /* Здесь вы можете установить требуемую ширину и высоту для кружка статуса */
+  height: 25px;
+  border-radius: 50%;
+}
+
+.status-icon,
+.status-text {
+  color: white;
+}
+
+.status-icon {
+  font-size: 12px; /* Здесь вы можете установить требуемый размер иконки статуса */
+}
+
+.status-text {
+  font-size: 10px; /* Здесь вы можете установить требуемый размер текста статуса */
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); /* полупрозрачный цвет */
+  border-radius: 50%;
+}
+
+.avatar-overlay mat-icon {
+  color: white; /* цвет иконки */
+  font-size: 50px; /* размер иконки */
+}

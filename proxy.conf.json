@@ -1,0 +1,13 @@
+{
+  "/api": {
+    "target": "http://game.ataman-club.ru",
+    "secure": false,
+    "changeOrigin": true
+  },
+
+  "/stream": {
+    "target": "wss://game.ataman-club.ru",
+    "secure": false,
+    "ws": true
+  }
+}

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {
-  StateManagerService,
+  GameStateManagerService,
   GameStates,
-} from 'src/app/services/state-manager.service';
+} from 'src/app/services/game-state-manager.service';
 
 @Component({
   selector: 'deck-selection',
@@ -17,7 +17,7 @@ export class DeckSelectionComponent implements OnInit {
   ];
   public pathToImages = '../assets/images/';
 
-  constructor(private stateManagerService: StateManagerService) {}
+  constructor(private stateManagerService: GameStateManagerService) {}
 
   ngOnInit() {
     this.stateManagerService.setState(GameStates.DeckSelection);

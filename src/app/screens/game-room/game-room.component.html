@@ -1,0 +1,31 @@
+<div class="users-bar">
+  <primary-button
+    *ngIf="isMaster"
+    name="СОЗДАТЬ РАУНД"
+    [extended]="true"
+    (click)="createRound()"
+  ></primary-button>
+  <user-icon
+    *ngFor="let player of players | async"
+    [avatarUrl]="player.avatar"
+    infoCircleType="score"
+    [playerScore]="player.points"
+  ></user-icon>
+</div>
+<div class="table">
+  <div class="table-cards">
+    <card *ngFor="let card of tableCards | async" [url]="card.url"></card>
+  </div>
+</div>
+<div class="player-panel">
+  <div class="player-cards">
+    <card *ngFor="let card of playerCards | async" [url]="card.url"></card>
+  </div>
+  <div class="input-panel">
+    <form [formGroup]="associationFrom" (ngSubmit)="sendChoice()">
+      <p>{{ selectedCard }}</p>
+      <input formControlName="association" type="text" />
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
+</div>

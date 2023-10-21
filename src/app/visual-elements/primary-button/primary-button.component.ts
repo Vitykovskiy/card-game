@@ -9,6 +9,7 @@ export class PrimaryButtonComponent {
   @Input() name: string | undefined;
   @Input() icon: string | undefined;
   @Input() extended: boolean = false;
+  @Input() disabled: boolean = false;
   @Input() color: 'main' | 'secondary' = 'main';
   @Input() scale: number = 1;
 

@@ -1,0 +1,24 @@
+.table {
+  border: 1px solid red;
+  display: flex;
+}
+
+.table-cards {
+  display: flex;
+  border: 1px solid blueviolet;
+}
+
+.player-panel {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid green;
+}
+
+.player-cards {
+  display: flex;
+  border: 1px solid blueviolet;
+}
+
+.player-input {
+  border: 1px solid blue;
+}

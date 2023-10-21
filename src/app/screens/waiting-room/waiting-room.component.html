@@ -1,1 +1,32 @@
-<p>waiting-room works!</p>
+<div class="users-container">
+  <user-icon
+    *ngFor="let player of playersList | async"
+    [avatarUrl]="player.avatar"
+    statusType="ready-state"
+    [playerReady]="player.ready"
+    [playerColor]="'green'"
+  />
+</div>
+<div class="tool-panel">
+  <primary-button
+    *ngIf="isUserMaster"
+    [extended]="true"
+    name="НАЧАТЬ"
+    [disabled]="false"
+    (click)="setGameStatusToPlaying()"
+  ></primary-button>
+  <primary-button
+    *ngIf="!isUserMaster"
+    [extended]="true"
+    name="ГОТОВ"
+    (click)="setReadyStatus()"
+    [disabled]="false"
+  ></primary-button>
+  <primary-button
+    *ngIf="!isUserMaster"
+    [extended]="true"
+    name="НЕ ГОТОВ"
+    (click)="setNotReadyStatus()"
+    [disabled]="false"
+  ></primary-button>
+</div>
