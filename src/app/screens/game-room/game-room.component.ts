@@ -13,11 +13,13 @@ import { RoundStateManagerService } from 'src/app/services/round-state-manager.s
 })
 export class GameRoomComponent implements OnInit {
   public associationFrom: FormGroup;
-  public selectedCard = '';
-  public playerCards: Observable<ICard[]>;
-  public tableCards: Observable<ICard[]>;
-  public leader: Observable<number | null>;
+  public selectedCard: number | null = null;
+  public playerCards$: Observable<ICard[]>;
+  public tableCards$: Observable<ICard[]>;
+  public leader: number | null;
+  public leader$: Observable<number | null>;
   public playerId: number | null;
+  public associationText$: Observable<string | null>;
 
   constructor(
     private _roundStateManagerService: RoundStateManagerService,
@@ -27,18 +29,32 @@ export class GameRoomComponent implements OnInit {
     this.associationFrom = new FormGroup({
       association: new FormControl(null),
     });
-    this.playerCards = this._roundStateManagerService.playerCards;
-    this.tableCards = this._roundStateManagerService.tableCards;
+    this.playerCards$ = this._roundStateManagerService.playerCards;
+    this.tableCards$ = this._roundStateManagerService.tableCards;
     this.leader = this._roundStateManagerService.leader;
+    this.leader$ = this._roundStateManagerService.getLeaderObservable();
     this.playerId = this._gameStateManagerService.playerId;
+    this.associationText$ = this._roundStateManagerService.associationText;
   }
 
   public get players() {
-    return this._roundStateManagerService.getPlayersObservable();
+    return this._roundStateManagerService.players;
   }
 
   public get isMaster() {
     return this._gameStateManagerService.isUserMaster;
+  }
+
+  public get isLeader() {
+    return this._roundStateManagerService.leader;
+  }
+
+  onCardClick(card: number) {
+    if (card === this.selectedCard) {
+      this.selectedCard = null;
+    } else {
+      this.selectedCard = card;
+    }
   }
 
   ngOnInit(): void {
@@ -49,7 +65,20 @@ export class GameRoomComponent implements OnInit {
     this._roundStateManagerService.createRound();
   }
 
-  sendChoice() {
-    this._requestService.emitMessage({});
+  chooseLeaderCard() {
+    this._requestService.emitMessage({ choice: this.selectedCard });
+  }
+
+  sendAssociation() {
+    this._requestService.emitMessage({
+      association_card: this.selectedCard,
+    });
+  }
+
+  sendAssociationByLeader() {
+    this._requestService.emitMessage({
+      association_text: this.associationFrom.controls['association'].value,
+      association_card: this.selectedCard,
+    });
   }
 }

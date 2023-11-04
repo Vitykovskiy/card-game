@@ -101,7 +101,7 @@ export class AppModule {}
 
 import { Component, OnInit } from '@angular/core';
 import {
-  StateManagerService,
+  GameStateManagerService,
   GameStates,
 } from 'src/app/services/state-manager.service';
 
@@ -118,7 +118,7 @@ export class DeckSelectionComponent implements OnInit {
   ];
   public pathToImages = '../assets/images/';
 
-  constructor(private stateManagerService: StateManagerService) {}
+  constructor(private stateManagerService: GameStateManagerService) {}
 
   ngOnInit() {
     this.stateManagerService.setState(GameStates.DeckSelection);
@@ -146,21 +146,21 @@ import { Component } from '@angular/core';
 export class GameResultsComponent {}
 
 
-/* game-table.component.html */
+/* game-room.component.html */
 
-<p>game-table works!</p>
+<p>game-room works!</p>
 
 
-/* game-table.component.ts */
+/* game-room.component.ts */
 
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'game-table',
-  templateUrl: './game-table.component.html',
-  styleUrls: ['./game-table.component.scss'],
+  selector: 'game-room',
+  templateUrl: './game-room.component.html',
+  styleUrls: ['./game-room.component.scss'],
 })
-export class GameTableComponent {}
+export class GameRoomComponent {}
 
 
 /* player-cards-screen.component.html */
@@ -208,7 +208,7 @@ import { Observable } from 'rxjs';
 import { Status } from 'src/app/services/interfaces';
 import { RequestService } from 'src/app/services/request.service';
 import {
-  StateManagerService,
+  GameStateManagerService,
   GameStates,
 } from 'src/app/services/state-manager.service';
 
@@ -219,11 +219,11 @@ import {
 })
 export class RoomSettingsComponent implements OnInit {
   constructor(
-    private _stateManagerService: StateManagerService,
+    private _gameStateManagerService: GameStateManagerService,
     private _requestService: RequestService,
   ) {}
   ngOnInit() {
-    this._stateManagerService.setState(GameStates.RoomSettings);
+    this._gameStateManagerService.setState(GameStates.RoomSettings);
   }
 
   createGame(): void {
@@ -290,7 +290,7 @@ export class RoomSettingsComponent implements OnInit {
 import { Component, OnInit } from '@angular/core';
 import {
   GameStates,
-  StateManagerService,
+  GameStateManagerService,
 } from 'src/app/services/state-manager.service';
 
 @Component({
@@ -299,7 +299,7 @@ import {
   styleUrls: ['./start-screen.component.scss'],
 })
 export class StartScreenComponent implements OnInit {
-  constructor(private stateManagerService: StateManagerService) {}
+  constructor(private stateManagerService: GameStateManagerService) {}
 
   ngOnInit() {
     this.stateManagerService.setState(GameStates.Start);
@@ -326,7 +326,7 @@ export class WaitingRoomComponent {}
 
 /* interfaces.ts */
 
-interface ICreateGameRequestDTO {
+interface ICreateGameDTO {
   creator: number;
   deck: number;
   members_num: number;
@@ -370,7 +370,7 @@ enum Status {
 }
 
 export {
-  ICreateGameRequestDTO,
+  ICreateGameDTO,
   ICreateGameResponseDTO,
   IJoinGameRequestDTO,
   IJoinGameResponseDTO,
@@ -385,7 +385,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { filter, map, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { ICreateGameRequestDTO } from './interfaces';
+import { ICreateGameDTO } from './interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -438,7 +438,7 @@ export class RequestService {
   put(endpoint: string, body: any) {
     return this.http.put(`${this.url}/${endpoint}`, body);
   }
-  createGame(newGameOptions: ICreateGameRequestDTO): Observable<any> {
+  createGame(newGameOptions: ICreateGameDTO): Observable<any> {
     return this.post('api/game/create/', newGameOptions);
   }
 }
@@ -458,7 +458,7 @@ export enum GameStates {
 @Injectable({
   providedIn: 'root',
 })
-export class StateManagerService {
+export class GameStateManagerService {
   public currentState: Observable<string | null>;
   private _stateSource: BehaviorSubject<string | null>;
   private _currentDeck: BehaviorSubject<string | null>;
@@ -532,7 +532,7 @@ export class NumericInputComponent {
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { StateManagerService } from 'src/app/services/state-manager.service';
+import { GameStateManagerService } from 'src/app/services/state-manager.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -544,7 +544,7 @@ export class ToolPanelComponent {
   constructor(
     private router: Router,
     private location: Location,
-    private stateManagerService: StateManagerService,
+    private stateManagerService: GameStateManagerService,
   ) {}
 
   get currentState(): Observable<string | null> {

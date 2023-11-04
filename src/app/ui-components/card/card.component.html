@@ -1,3 +1,7 @@
 <div class="card">
-  <img [src]="'https://game.ataman-club.ru' + url" alt="" />
+  <img
+    [ngClass]="{ selected: selected }"
+    [src]="'https://game.ataman-club.ru' + url"
+    alt=""
+  />
 </div>

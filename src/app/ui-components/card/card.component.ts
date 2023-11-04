@@ -7,4 +7,5 @@ import { Component, Input } from '@angular/core';
 })
 export class CardComponent {
   @Input() url: string = '';
+  @Input() selected = false;
 }

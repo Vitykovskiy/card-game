@@ -14,34 +14,34 @@ import {
   transformCardsObjectToArray,
 } from '../interfaces/round.interfaces';
 
-export enum GameStates {
-  Start = 'start',
-  DeckSelection = 'deck-selection',
-  RoomSettings = 'room-settings',
-  JoinGame = 'join-game',
-  PlayRoom = 'play-room',
+export enum RoundStates {
+  None = 'none',
+  LeaderAssociation = 'leader-association',
+  PlayersAssociation = 'players-association',
+  PlayersChoices = 'player-choice',
+  RoundResult = 'round-result',
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoundStateManagerService implements OnInit {
-  private _associationText = new BehaviorSubject<string | null>(null);
-  private _associationCard = new BehaviorSubject<number | null>(null);
+  private _rounsState = new BehaviorSubject<RoundStates>(RoundStates.None);
 
   private _leader = new BehaviorSubject<number | null>(null);
+  private _leaderAssociationText = new BehaviorSubject<string | null>(null);
+  private _leaderAssociationCard = new BehaviorSubject<number | null>(null);
+
+  private _associationText = new BehaviorSubject<string | null>(null);
 
   private _yourCard = new BehaviorSubject<number | null>(null);
   private _roundResult = new BehaviorSubject<IResultRoundData | null>(null);
 
   private _players = new BehaviorSubject<IPlayer[]>([]);
   private _tableCards = new BehaviorSubject<ISelectedCards | null>(null);
-  private _playerCards = new BehaviorSubject<{ [key: string]: string } | null>({
-    4: '/media/cards/2.jpg',
-    5: '/media/cards/3.jpg',
-    9: '/media/cards/7.jpg',
-    15: '/media/cards/13.jpeg',
-  });
+  private _playerCards = new BehaviorSubject<{ [key: string]: string } | null>(
+    null,
+  );
 
   private _websocketObservable: Observable<any> | null = null;
 
@@ -54,13 +54,25 @@ export class RoundStateManagerService implements OnInit {
     this.onStartGame();
   }
 
+  public get rounsState(): Observable<RoundStates> {
+    return this._rounsState.asObservable();
+  }
+
+  public set roundState(state: RoundStates) {
+    this._rounsState.next(state);
+  }
+
   public get playerCards(): Observable<ICard[]> {
     return this._playerCards
       .asObservable()
       .pipe(map((value) => transformCardsObjectToArray(value)));
   }
 
-  public get leader(): Observable<number | null> {
+  public get leader(): number | null {
+    return this._leader.getValue();
+  }
+
+  public getLeaderObservable(): Observable<number | null> {
     return this._leader.asObservable();
   }
 
@@ -76,8 +88,12 @@ export class RoundStateManagerService implements OnInit {
     );
   }
 
-  public getPlayersObservable(): Observable<IPlayer[]> {
+  public get players(): Observable<IPlayer[]> {
     return this._players.asObservable();
+  }
+
+  public get associationText(): Observable<string | null> {
+    return this._associationText.asObservable();
   }
 
   public setGameStatusToPlaying() {
@@ -102,11 +118,11 @@ export class RoundStateManagerService implements OnInit {
     const association = {} as any;
     if (card) {
       association.association_card = card;
-      this._associationCard.next(card);
+      this._leaderAssociationCard.next(card);
     }
     if (text) {
       association.association_text = text;
-      this._associationText.next(text);
+      this._leaderAssociationText.next(text);
     }
     this._requestService.emitMessage(association);
   }
@@ -121,20 +137,26 @@ export class RoundStateManagerService implements OnInit {
     this._websocketObservable.subscribe((data: any) => {
       switch (checkRoundDataType(data)) {
         case RoundDataTypes.StartData:
+          this.roundState = RoundStates.LeaderAssociation;
           this._onStartRound(data as IStartRoundData);
           break;
-        case RoundDataTypes.ResultData:
-          this._onFinishRound(data as IResultRoundData);
+        case RoundDataTypes.AssociationReceived:
+          this.roundState = RoundStates.PlayersAssociation;
+          this._onAssociationReceived(data);
           break;
         case RoundDataTypes.SelectedCardsData:
+          this.roundState = RoundStates.PlayersChoices;
           this._onGetCards(data as ISelectedCards);
+          break;
+        case RoundDataTypes.ResultData:
+          this.roundState = RoundStates.RoundResult;
+          this._onFinishRound(data as IResultRoundData);
           break;
       }
     });
   }
 
   private _onStartRound(roundData: IStartRoundData) {
-    console.log('_onStartRound');
     this._gameStateManagerService.setGameStatus(roundData.game_status);
     this._leader.next(roundData.leader_id);
     this._playerCards.next(roundData.player_cards);
@@ -148,12 +170,14 @@ export class RoundStateManagerService implements OnInit {
   }
 
   private _onFinishRound(roundData: IResultRoundData) {
-    console.log('_onFinishRound');
     this._roundResult.next(roundData);
   }
 
   private _onGetCards(selectedCards: ISelectedCards) {
-    console.log('_onGetCards');
     this._tableCards.next(selectedCards);
+  }
+
+  private _onAssociationReceived(data: { association_text: string }) {
+    this._associationText.next(data.association_text);
   }
 }

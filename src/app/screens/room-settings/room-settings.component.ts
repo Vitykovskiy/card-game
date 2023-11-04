@@ -63,7 +63,7 @@ export class RoomSettingsComponent implements OnInit {
         creator: playerId,
         deck: this._decks[0].id,
         members_num: 4,
-        points_to_win: 40,
+        points_to_win: 20,
       })
       .pipe(
         map((gameData) => {

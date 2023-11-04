@@ -57,9 +57,7 @@ export class GameStateManagerService {
 
   private _isUserMaster = false;
   private _gameStatus = new BehaviorSubject<GameStatus>(GameStatus.None);
-  private _players = new BehaviorSubject<IPlayerInfo[] | null>(
-    [], //TEST_PLAYERS_LIST,
-  );
+  private _players = new BehaviorSubject<IPlayerInfo[] | null>([]);
 
   private _websocketObservable: Observable<any> | null = null;
 

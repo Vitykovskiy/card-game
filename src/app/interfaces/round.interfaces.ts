@@ -4,6 +4,7 @@ enum RoundDataTypes {
   ResultData = 'result',
   StartData = 'start',
   SelectedCardsData = 'selected-cards',
+  AssociationReceived = 'association',
 }
 
 interface IResultRoundData {
@@ -33,7 +34,7 @@ interface ISelectedCards {
 }
 
 interface ICard {
-  id: string;
+  id: number;
   url: string;
 }
 
@@ -59,22 +60,25 @@ function isStartRoundData(data: any): boolean {
   );
 }
 
-function IsSelectedCardsData(data: any): boolean {
+function isSelectedCardsData(data: any): boolean {
   return 'your_card' in data && 'placeCards' in data;
+}
+
+function isAssociationTextData(data: any): boolean {
+  return 'association_text' in data;
 }
 
 function checkRoundDataType(data: any): RoundDataTypes | null {
   if (isStartRoundData(data)) {
-    console.log('isStartRoundData');
     return RoundDataTypes.StartData;
   }
   if (isResultRoundData(data)) {
-    console.log('isResultRoundData');
     return RoundDataTypes.ResultData;
   }
-
-  if (IsSelectedCardsData(data)) {
-    console.log('IsSelectedCardsData');
+  if (isAssociationTextData(data)) {
+    return RoundDataTypes.AssociationReceived;
+  }
+  if (isSelectedCardsData(data)) {
     return RoundDataTypes.SelectedCardsData;
   }
   return null;
@@ -91,7 +95,7 @@ export function transformCardsObjectToArray(
   const cardsIds = Object.keys(data);
   const cardsUrls = Object.values(data);
   return cardsUrls.map((url, index) => {
-    return { id: cardsIds[index], url: url };
+    return { id: Number(cardsIds[index]), url: url };
   });
 }
 
