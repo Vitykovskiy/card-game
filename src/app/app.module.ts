@@ -10,10 +10,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { VisualElementsModule } from './visual-elements/visual-elements.module';
 import { HttpClientModule } from '@angular/common/http';
 import { JoinGameComponent } from './screens/join-game/join-game.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { WaitingRoomComponent } from './screens/waiting-room/waiting-room.component';
 import { GameRoomComponent } from './screens/game-room/game-room.component';
 import { CardComponent } from './ui-components/card/card.component';
+import { MatIconModule } from '@angular/material/icon';
+import { InfoContainerComponent } from './ui-components/info-container/info-container.component';
+import { AssociationInputComponent } from './ui-components/association-input/association-input.component';
+import { TodoListComponent } from './ui-components/todo-list/todo-list.component';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 const appRoutes: Routes = [
   { path: '', component: StartScreenComponent },
@@ -34,6 +40,9 @@ const appRoutes: Routes = [
     WaitingRoomComponent,
     GameRoomComponent,
     CardComponent,
+    InfoContainerComponent,
+    AssociationInputComponent,
+    TodoListComponent,
   ],
   imports: [
     BrowserModule,
@@ -43,6 +52,10 @@ const appRoutes: Routes = [
     HttpClientModule,
     BrowserModule,
     ReactiveFormsModule,
+    MatIconModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

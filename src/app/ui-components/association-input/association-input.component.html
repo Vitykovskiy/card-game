@@ -1,0 +1,22 @@
+<div *ngIf="!isAssociationTextReady">
+  <form [formGroup]="associationForm" (ngSubmit)="sendMessage()">
+    <mat-form-field>
+      <textarea
+        matInput
+        formControlName="association"
+        rows="6"
+        placeholder="Пишите вашу ассоциацию сюда..."
+      ></textarea>
+    </mat-form-field>
+    <primary-button icon="arrow_forward_ios" color="secondary"></primary-button>
+  </form>
+</div>
+
+<div *ngIf="isAssociationTextReady" class="form-complete">
+  <p>{{ associationForm.controls["association"].value }}</p>
+  <primary-button
+    icon="edit"
+    color="secondary"
+    (click)="editMessage()"
+  ></primary-button>
+</div>

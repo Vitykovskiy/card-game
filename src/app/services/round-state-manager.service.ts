@@ -14,19 +14,21 @@ import {
   transformCardsObjectToArray,
 } from '../interfaces/round.interfaces';
 
-export enum RoundStates {
-  None = 'none',
-  LeaderAssociation = 'leader-association',
-  PlayersAssociation = 'players-association',
-  PlayersChoices = 'player-choice',
-  RoundResult = 'round-result',
+export enum RoundStep {
+  None,
+  LeaderThinking,
+  ChooseAssociationCard,
+  WaitPlayersAssociationCard,
+  ChooseLeadersCard,
+  WaitPlayersLeadersCardChoise,
+  RoundResults,
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoundStateManagerService implements OnInit {
-  private _rounsState = new BehaviorSubject<RoundStates>(RoundStates.None);
+  private _roundStep = new BehaviorSubject<RoundStep>(RoundStep.None);
 
   private _leader = new BehaviorSubject<number | null>(null);
   private _leaderAssociationText = new BehaviorSubject<string | null>(null);
@@ -54,12 +56,12 @@ export class RoundStateManagerService implements OnInit {
     this.onStartGame();
   }
 
-  public get rounsState(): Observable<RoundStates> {
-    return this._rounsState.asObservable();
+  public get roundStep(): Observable<RoundStep> {
+    return this._roundStep.asObservable();
   }
 
-  public set roundState(state: RoundStates) {
-    this._rounsState.next(state);
+  public set roundStep(state: RoundStep) {
+    this._roundStep.next(state);
   }
 
   public get playerCards(): Observable<ICard[]> {
@@ -137,19 +139,19 @@ export class RoundStateManagerService implements OnInit {
     this._websocketObservable.subscribe((data: any) => {
       switch (checkRoundDataType(data)) {
         case RoundDataTypes.StartData:
-          this.roundState = RoundStates.LeaderAssociation;
+          this.roundStep = RoundStep.LeaderThinking;
           this._onStartRound(data as IStartRoundData);
           break;
         case RoundDataTypes.AssociationReceived:
-          this.roundState = RoundStates.PlayersAssociation;
+          this.roundStep = RoundStep.ChooseAssociationCard;
           this._onAssociationReceived(data);
           break;
         case RoundDataTypes.SelectedCardsData:
-          this.roundState = RoundStates.PlayersChoices;
+          this.roundStep = RoundStep.ChooseLeadersCard;
           this._onGetCards(data as ISelectedCards);
           break;
         case RoundDataTypes.ResultData:
-          this.roundState = RoundStates.RoundResult;
+          this.roundStep = RoundStep.RoundResults;
           this._onFinishRound(data as IResultRoundData);
           break;
       }
