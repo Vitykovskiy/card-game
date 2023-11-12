@@ -98,6 +98,10 @@ export class RoundStateManagerService implements OnInit {
     return this._associationText.asObservable();
   }
 
+  public set associationText(text: string) {
+    this._associationText.next(text);
+  }
+
   public setGameStatusToPlaying() {
     this._requestService.emitMessage({
       game_status: GameStatus.Playing,

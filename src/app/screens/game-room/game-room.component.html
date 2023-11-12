@@ -31,9 +31,24 @@
   </div>
 </div>
 <div class="player-panel">
-  <div *ngIf="showInfoContainer$ | async"></div>
-  <div *ngIf="showHints$ | async" class="hints"></div>
-  <div *ngIf="showAssociationInput$ | async" class="association-input"></div>
-  <div *ngIf="showAssociationText$ | async" class="association-text"></div>
+  <div *ngIf="showInfoContainer$ | async">
+    <info-container [infoMessage]="contextInfo$ | async"></info-container>
+  </div>
+  <div *ngIf="showHints$ | async" class="hints">
+    <todo-list [checkListItems]="checkListItems$ | async"></todo-list>
+  </div>
+  <div *ngIf="showAssociationInput$ | async" class="association-input">
+    <association-input
+      (associationTextCreated)="onSaveAssociationText($event)"
+    ></association-input>
+  </div>
+  <div *ngIf="showAssociationText$ | async" class="association-text">
+    <info-container
+      [infoMessage]="{
+        header: 'Ассоациация',
+        text: (associationText$ | async) ?? '...'
+      }"
+    ></info-container>
+  </div>
   <div *ngIf="showConfirmBtn$ | async" class="confirm-btn-container"></div>
 </div>

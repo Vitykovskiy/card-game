@@ -1,5 +1,5 @@
 <div class="check-list">
-  <div *ngFor="let item of checkListItems | async" class="check-list-item">
+  <div *ngFor="let item of checkListItems" class="check-list-item">
     <mat-icon *ngIf="item.done" fontIcon="done"></mat-icon>
     <mat-icon *ngIf="!item.done" fontIcon="close"></mat-icon>
     <p>{{ item.text }}</p>

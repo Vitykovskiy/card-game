@@ -7,7 +7,7 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./association-input.component.scss'],
 })
 export class AssociationInputComponent {
-  @Output() messageEvent = new EventEmitter<string>();
+  @Output() associationText = new EventEmitter<string>();
 
   public associationForm = new FormGroup({
     association: new FormControl(null),
@@ -18,7 +18,7 @@ export class AssociationInputComponent {
     const association = this.associationForm.controls['association'].value;
     if (association) {
       this.isAssociationTextReady = true;
-      this.messageEvent.emit(association);
+      this.associationText.emit(association);
       console.log(association);
     }
   }

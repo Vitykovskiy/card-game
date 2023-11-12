@@ -1,20 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Component, Input } from '@angular/core';
+
+export interface ITodoItem {
+  type: string;
+  text: string;
+  done: boolean;
+}
 
 @Component({
   selector: 'todo-list',
   templateUrl: './todo-list.component.html',
   styleUrls: ['./todo-list.component.scss'],
 })
-export class TodoListComponent implements OnInit {
-  @Input() checkListItems = new BehaviorSubject<
-    { text: string; done: boolean }[]
-  >([]);
-
-  ngOnInit(): void {
-    this.checkListItems.next([
-      { text: 'Выберите карту для ассоциации', done: false },
-      { text: 'Напишите ассоциацию в поле справа', done: false },
-    ]);
-  }
+export class TodoListComponent {
+  @Input() checkListItems: ITodoItem[] | null = [];
 }
