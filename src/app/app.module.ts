@@ -13,11 +13,11 @@ import { JoinGameComponent } from './screens/join-game/join-game.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { WaitingRoomComponent } from './screens/waiting-room/waiting-room.component';
 import { GameRoomComponent } from './screens/game-room/game-room.component';
-import { CardComponent } from './ui-components/card/card.component';
+import { CardComponent } from './widgets/card/card.component';
 import { MatIconModule } from '@angular/material/icon';
-import { InfoContainerComponent } from './ui-components/info-container/info-container.component';
-import { AssociationInputComponent } from './ui-components/association-input/association-input.component';
-import { TodoListComponent } from './ui-components/todo-list/todo-list.component';
+import { InfoContainerComponent } from './widgets/info-container/info-container.component';
+import { AssociationInputComponent } from './widgets/association-input/association-input.component';
+import { TodoListComponent } from './widgets/todo-list/todo-list.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
