@@ -143,27 +143,27 @@ export class RoundStateManagerService implements OnInit {
     this._websocketObservable.subscribe((data: any) => {
       switch (checkRoundDataType(data)) {
         case RoundDataTypes.StartData:
-          this.roundStep = RoundStep.LeaderThinking;
           this._onStartRound(data as IStartRoundData);
+          this.roundStep = RoundStep.LeaderThinking;
           break;
         case RoundDataTypes.AssociationReceived:
-          this.roundStep = RoundStep.ChooseAssociationCard;
           this._onAssociationReceived(data);
+          this.roundStep = RoundStep.ChooseAssociationCard;
           break;
         case RoundDataTypes.SelectedCardsData:
-          this.roundStep = RoundStep.ChooseLeadersCard;
           this._onGetCards(data as ISelectedCards);
+          this.roundStep = RoundStep.ChooseLeadersCard;
           break;
         case RoundDataTypes.ResultData:
-          this.roundStep = RoundStep.RoundResults;
           this._onFinishRound(data as IResultRoundData);
+          this.roundStep = RoundStep.RoundResults;
           break;
       }
     });
   }
 
   private _onStartRound(roundData: IStartRoundData) {
-    this._gameStateManagerService.setGameStatus(roundData.game_status);
+    console.log('_onStartRound', roundData.leader_id);
     this._leader.next(roundData.leader_id);
     this._playerCards.next(roundData.player_cards);
     const players = Object.keys(roundData.players).map((id) => {
@@ -173,6 +173,7 @@ export class RoundStateManagerService implements OnInit {
       };
     });
     this._players.next(players);
+    this._gameStateManagerService.setGameStatus(roundData.game_status);
   }
 
   private _onFinishRound(roundData: IResultRoundData) {

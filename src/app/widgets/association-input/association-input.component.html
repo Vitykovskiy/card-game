@@ -1,5 +1,5 @@
 <div *ngIf="!isAssociationTextReady">
-  <form [formGroup]="associationForm" (ngSubmit)="sendMessage()">
+  <form [formGroup]="associationForm" (ngSubmit)="onSaveText()">
     <mat-form-field>
       <textarea
         matInput
@@ -17,6 +17,6 @@
   <primary-button
     icon="edit"
     color="secondary"
-    (click)="editMessage()"
+    (click)="onEditText()"
   ></primary-button>
 </div>

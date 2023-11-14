@@ -7,23 +7,25 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./association-input.component.scss'],
 })
 export class AssociationInputComponent {
-  @Output() associationText = new EventEmitter<string>();
+  @Output() saveText = new EventEmitter<string>();
+  @Output() editText = new EventEmitter<void>();
 
   public associationForm = new FormGroup({
     association: new FormControl(null),
   });
   public isAssociationTextReady = false;
 
-  sendMessage() {
+  onSaveText() {
     const association = this.associationForm.controls['association'].value;
     if (association) {
       this.isAssociationTextReady = true;
-      this.associationText.emit(association);
+      this.saveText.emit(association);
       console.log(association);
     }
   }
 
-  editMessage() {
+  onEditText() {
+    this.editText.emit();
     this.isAssociationTextReady = false;
   }
 }

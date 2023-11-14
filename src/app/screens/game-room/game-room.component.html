@@ -22,10 +22,16 @@
     Association text: {{ associationText$ | async }}
   </div> -->
   <div class="table-cards">
-    <card
+    <!--     <card
       *ngFor="let card of tableCards$ | async"
       [url]="card.url"
-      [selected]="card.id === selectedCard"
+      [selected]="card.id === (selectedCard$ | async)"
+      (click)="onCardClick(card.id)"
+    ></card> -->
+    <card
+      *ngFor="let card of cardsInHand$ | async"
+      [url]="card.url"
+      [selected]="card.id === (selectedCard$ | async)"
       (click)="onCardClick(card.id)"
     ></card>
   </div>
@@ -39,16 +45,23 @@
   </div>
   <div *ngIf="showAssociationInput$ | async" class="association-input">
     <association-input
-      (associationTextCreated)="onSaveAssociationText($event)"
+      (saveText)="onSaveAssociationText($event)"
+      (editText)="onEditAssociationText()"
     ></association-input>
   </div>
   <div *ngIf="showAssociationText$ | async" class="association-text">
     <info-container
       [infoMessage]="{
-        header: 'Ассоациация',
+        header: 'Ассоциация',
         text: (associationText$ | async) ?? '...'
       }"
     ></info-container>
   </div>
-  <div *ngIf="showConfirmBtn$ | async" class="confirm-btn-container"></div>
+  <div *ngIf="showConfirmBtn$ | async" class="confirm-btn-container">
+    <primary-button
+      name="Подтвердить выбор"
+      [extended]="true"
+      (click)="sendAssociationByLeader()"
+    ></primary-button>
+  </div>
 </div>
