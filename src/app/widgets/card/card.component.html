@@ -1,7 +1,12 @@
 <div class="card">
   <img
-    [ngClass]="{ selected: selected }"
-    [src]="'https://game.ataman-club.ru' + url"
+    *ngIf="cardUrl && show"
+    class="card-item"
+    [ngClass]="{ selected: selected && !isYourCard }"
+    [src]="cardUrl"
     alt=""
   />
+  <div class="overlay" *ngIf="isYourCard">
+    <span class="overlay-text">Ваша карта</span>
+  </div>
 </div>

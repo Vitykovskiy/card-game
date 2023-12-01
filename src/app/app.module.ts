@@ -20,6 +20,7 @@ import { AssociationInputComponent } from './widgets/association-input/associati
 import { TodoListComponent } from './widgets/todo-list/todo-list.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { CardsPanelComponent } from './widgets/cards-panel/cards-panel.component';
 
 const appRoutes: Routes = [
   { path: '', component: StartScreenComponent },
@@ -43,6 +44,7 @@ const appRoutes: Routes = [
     InfoContainerComponent,
     AssociationInputComponent,
     TodoListComponent,
+    CardsPanelComponent,
   ],
   imports: [
     BrowserModule,

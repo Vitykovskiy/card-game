@@ -3,6 +3,7 @@ import {
   GameStateManagerService,
   GameStates,
 } from 'src/app/services/game-state-manager.service';
+import { RequestService } from 'src/app/services/request.service';
 
 @Component({
   selector: 'deck-selection',
@@ -17,9 +18,18 @@ export class DeckSelectionComponent implements OnInit {
   ];
   public pathToImages = '../assets/images/';
 
-  constructor(private stateManagerService: GameStateManagerService) {}
+  constructor(
+    private stateManagerService: GameStateManagerService,
+    private _requestService: RequestService,
+  ) {}
 
   ngOnInit() {
+    console.log('');
+    this._requestService.getDecksRequest().subscribe((data: any) => {
+      console.log('getDecksRequest', data);
+      this._decks = data;
+    });
+
     this.stateManagerService.setState(GameStates.DeckSelection);
     this.decksPreviews = this.decksPreviews.map(
       (path: string) => this.pathToImages + path,

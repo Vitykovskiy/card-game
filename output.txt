@@ -632,9 +632,9 @@ import { PrimaryButtonComponent } from './primary-button/primary-button.componen
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NumericInputComponent } from '../ui-components/numeric-input/numeric-input.component';
-import { UserIconComponent } from '../ui-components/user-icon/user-icon.component';
-import { ToolPanelComponent } from '../ui-components/tool-panel/tool-panel.component';
+import { NumericInputComponent } from '../widgets/numeric-input/numeric-input.component';
+import { UserIconComponent } from '../widgets/user-icon/user-icon.component';
+import { ToolPanelComponent } from '../widgets/tool-panel/tool-panel.component';
 
 @NgModule({
   declarations: [

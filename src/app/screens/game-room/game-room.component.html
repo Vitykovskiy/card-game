@@ -2,9 +2,9 @@
   <div class="users">
     <user-icon
       *ngFor="let player of players | async"
-      [avatarUrl]="player.avatar"
+      [avatarUrl]="player.avatar ?? ''"
       infoCircleType="score"
-      [playerScore]="player.points"
+      [playerScore]="player.points ?? 0"
     ></user-icon>
   </div>
   <primary-button
@@ -15,26 +15,7 @@
   ></primary-button>
 </div>
 <div class="cards-panel">
-  <!--   <div
-    class="association-text"
-    *ngIf="playerId && (leader$ | async) !== playerId"
-  >
-    Association text: {{ associationText$ | async }}
-  </div> -->
-  <div class="table-cards">
-    <!--     <card
-      *ngFor="let card of tableCards$ | async"
-      [url]="card.url"
-      [selected]="card.id === (selectedCard$ | async)"
-      (click)="onCardClick(card.id)"
-    ></card> -->
-    <card
-      *ngFor="let card of cardsInHand$ | async"
-      [url]="card.url"
-      [selected]="card.id === (selectedCard$ | async)"
-      (click)="onCardClick(card.id)"
-    ></card>
-  </div>
+  <cards-panel></cards-panel>
 </div>
 <div class="player-panel">
   <div *ngIf="showInfoContainer$ | async">
@@ -61,7 +42,7 @@
     <primary-button
       name="Подтвердить выбор"
       [extended]="true"
-      (click)="sendAssociationByLeader()"
+      (click)="sendCard()"
     ></primary-button>
   </div>
 </div>

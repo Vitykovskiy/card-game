@@ -10,12 +10,17 @@ import {
 import { IContextInfo } from 'src/app/widgets/info-container/info-container.component';
 import { ITodoItem } from 'src/app/widgets/todo-list/todo-list.component';
 
-enum WidgetType {
+enum PlayerPanelWidgetType {
   AssociationCheckList = 'association-check-list',
   AssociationInput = 'association-input',
   AssociationText = 'association-text',
   ConfirmButtom = 'confirm-button',
   InfoMessage = 'info-message',
+}
+
+enum CardsPanelType {
+  ClosedCards = 'closed',
+  OpenedCards = 'opened',
 }
 
 const CREATE_ASSOCIATION_CHECK_LIST = [
@@ -36,7 +41,9 @@ export class GameRoomComponent implements OnInit {
   public playerId: number | null;
   public associationText$: Observable<string | null>;
 
-  public playerPanelOptions$: BehaviorSubject<WidgetType[]>;
+  public cardsPanelWidgets$: BehaviorSubject<CardsPanelType[]>;
+
+  public playerPanelWidgets$: BehaviorSubject<PlayerPanelWidgetType[]>;
   public showInfoContainer$: BehaviorSubject<boolean>;
   public showHints$: BehaviorSubject<boolean>;
   public showAssociationText$: BehaviorSubject<boolean>;
@@ -49,14 +56,15 @@ export class GameRoomComponent implements OnInit {
   public checkListItems$: BehaviorSubject<ITodoItem[]>;
   public preliminaryAssociationText: string | null;
   public preliminaryAssociationCard: number | null;
-  public currentRoundStep: RoundStep;
 
   constructor(
     private _roundStateManagerService: RoundStateManagerService,
     private _gameStateManagerService: GameStateManagerService,
     private _requestService: RequestService,
   ) {
-    this.playerPanelOptions$ = new BehaviorSubject<WidgetType[]>([]);
+    this.cardsPanelWidgets$ = new BehaviorSubject<CardsPanelType[]>([]);
+
+    this.playerPanelWidgets$ = new BehaviorSubject<PlayerPanelWidgetType[]>([]);
     this.showInfoContainer$ = new BehaviorSubject<boolean>(false);
     this.showHints$ = new BehaviorSubject<boolean>(false);
     this.showAssociationText$ = new BehaviorSubject<boolean>(false);
@@ -64,11 +72,13 @@ export class GameRoomComponent implements OnInit {
     this.showAssociationInput$ = new BehaviorSubject<boolean>(false);
 
     this.selectedCard$ = new BehaviorSubject<number | null>(null);
-    this.cardsInHand$ = this._roundStateManagerService.playerCards;
-    this.tableCards$ = this._roundStateManagerService.tableCards;
+    this.cardsInHand$ =
+      this._roundStateManagerService.getPlayerCardsObservable();
+    this.tableCards$ = this._roundStateManagerService.getTableCardsObservable();
     this.leader$ = this._roundStateManagerService.getLeaderObservable();
     this.playerId = this._gameStateManagerService.playerId;
-    this.associationText$ = this._roundStateManagerService.associationText;
+    this.associationText$ =
+      this._roundStateManagerService.getAssociationTextObservable();
 
     this.contextInfo$ = new BehaviorSubject<IContextInfo | null>(null);
 
@@ -77,8 +87,6 @@ export class GameRoomComponent implements OnInit {
     );
     this.preliminaryAssociationText = null;
     this.preliminaryAssociationCard = null;
-
-    this.currentRoundStep = RoundStep.LeaderThinking;
   }
 
   get isPlayerLeader() {
@@ -86,7 +94,7 @@ export class GameRoomComponent implements OnInit {
   }
 
   public get players() {
-    return this._roundStateManagerService.players;
+    return this._roundStateManagerService.getPlayersObservbale();
   }
 
   public get isMaster() {
@@ -99,111 +107,146 @@ export class GameRoomComponent implements OnInit {
 
   ngOnInit(): void {
     this._roundStateManagerService.onStartGame();
-    this._roundStateManagerService.roundStep.subscribe((step: RoundStep) => {
-      this.currentRoundStep = step;
-      switch (step) {
-        case RoundStep.LeaderThinking:
-          if (this.isPlayerLeader) {
-            this.playerPanelOptions$.next([
-              WidgetType.AssociationCheckList,
-              WidgetType.AssociationInput,
-            ]);
-          } else {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          }
-          break;
-        case RoundStep.ChooseAssociationCard:
-          if (this.isPlayerLeader) {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          } else {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          }
-          break;
-        case RoundStep.WaitPlayersAssociationCard:
-          if (!this.isPlayerLeader) {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          }
-          break;
-        case RoundStep.ChooseLeadersCard:
-          if (!this.isPlayerLeader) {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          }
-          break;
-        case RoundStep.WaitPlayersLeadersCardChoise:
-          if (!this.isPlayerLeader) {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          }
-          break;
-        case RoundStep.RoundResults:
-          if (this.isPlayerLeader) {
-            this.playerPanelOptions$.next([
-              WidgetType.AssociationCheckList,
-              WidgetType.AssociationInput,
-            ]);
-          } else {
-            this.playerPanelOptions$.next([
-              WidgetType.InfoMessage,
-              WidgetType.AssociationText,
-            ]);
-          }
-          break;
-      }
-      this.contextInfo$.next(this._getRoundStepContextInfo(step));
-    });
+    this._roundStateManagerService
+      .getRoundStepObservable()
+      .subscribe((step: RoundStep) => {
+        this._roundStateManagerService.roundStep = step;
+        switch (step) {
+          case RoundStep.LeaderThinking:
+            if (this.isPlayerLeader) {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.AssociationCheckList,
+                PlayerPanelWidgetType.AssociationInput,
+              ]);
+            } else {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            }
+            break;
+          case RoundStep.ChooseAssociationCard:
+            if (this.isPlayerLeader) {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            } else {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            }
+            break;
+          case RoundStep.WaitPlayersAssociationCard:
+            if (!this.isPlayerLeader) {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            }
+            break;
+          case RoundStep.ChooseLeadersCard:
+            if (!this.isPlayerLeader) {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            }
+            break;
+          case RoundStep.WaitPlayersLeadersCardChoise:
+            if (!this.isPlayerLeader) {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            }
+            break;
+          case RoundStep.RoundResults:
+            if (this.isPlayerLeader) {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.AssociationCheckList,
+                PlayerPanelWidgetType.AssociationInput,
+              ]);
+            } else {
+              this.playerPanelWidgets$.next([
+                PlayerPanelWidgetType.InfoMessage,
+                PlayerPanelWidgetType.AssociationText,
+              ]);
+            }
+            break;
+        }
+        this.contextInfo$.next(this._getRoundStepContextInfo(step));
+      });
 
-    this.playerPanelOptions$.subscribe((widgets: WidgetType[]) => {
+    this.playerPanelWidgets$.subscribe((widgets: PlayerPanelWidgetType[]) => {
       this._showWidgets(widgets);
     });
 
     this.selectedCard$.subscribe((card: number | null) => {
       if (this.isPlayerLeader) {
-        if (this.currentRoundStep === RoundStep.LeaderThinking) {
-          this.preliminaryAssociationCard = card;
-          const checkListItems = this.checkListItems$.getValue();
-          const cardState = checkListItems.find((item) => item.type === 'card');
-          if (cardState) {
-            cardState.done = card ? true : false;
-          }
-          this.checkLeaderAssociationIsReadyToSend();
+        switch (this._roundStateManagerService.roundStep) {
+          case RoundStep.LeaderThinking:
+            this.preliminaryAssociationCard = card;
+            const checkListItems = this.checkListItems$.getValue();
+            const cardState = checkListItems.find(
+              (item) => item.type === 'card',
+            );
+            if (cardState) {
+              cardState.done = card ? true : false;
+            }
+            this.checkLeaderAssociationIsReadyToSend();
+            break;
         }
       } else {
+        switch (this._roundStateManagerService.roundStep) {
+          case RoundStep.ChooseAssociationCard:
+            this.onSelectLeaderCard(card);
+        }
       }
     });
   }
 
-  public sendAssociationByLeader() {
-    this._requestService.emitMessage({
-      association_text: this.preliminaryAssociationText,
-      association_card: this.selectedCard$.getValue(),
-    });
+  public onSelectLeaderCard(card: number | null) {
+    if (card) {
+      this._showWidgets([
+        PlayerPanelWidgetType.AssociationText,
+        PlayerPanelWidgetType.ConfirmButtom,
+      ]);
+    } else {
+      this._showWidgets([
+        PlayerPanelWidgetType.InfoMessage,
+        PlayerPanelWidgetType.AssociationText,
+      ]);
+    }
   }
 
-  public sendAssociation() {
-    this._requestService.emitMessage({
-      association_card: this.selectedCard$.getValue(),
-    });
-  }
-
-  public chooseLeaderCard() {
-    this._requestService.emitMessage({ choice: this.selectedCard$.getValue() });
+  public sendCard() {
+    if (this.isPlayerLeader) {
+      this._requestService.emitMessage({
+        association_text: this.preliminaryAssociationText,
+        association_card: this.selectedCard$.getValue(),
+      });
+      this._roundStateManagerService.roundStep =
+        RoundStep.WaitPlayersLeadersCardChoise;
+    } else {
+      switch (this._roundStateManagerService.roundStep) {
+        case RoundStep.ChooseAssociationCard:
+          this._requestService.emitMessage({
+            association_card: this.selectedCard$.getValue(),
+          });
+          this._roundStateManagerService.roundStep =
+            RoundStep.WaitPlayersAssociationCard;
+          break;
+        case RoundStep.ChooseLeadersCard:
+          this._requestService.emitMessage({
+            choice: this.selectedCard$.getValue(),
+          });
+          this._roundStateManagerService.roundStep =
+            RoundStep.WaitPlayersLeadersCardChoise;
+          break;
+      }
+    }
   }
 
   public onCardClick(card: number) {
@@ -245,32 +288,32 @@ export class GameRoomComponent implements OnInit {
     if (this.isPlayerLeader) {
       if (this.preliminaryAssociationText && this.preliminaryAssociationCard) {
         this._showWidgets([
-          WidgetType.AssociationInput,
-          WidgetType.ConfirmButtom,
+          PlayerPanelWidgetType.AssociationInput,
+          PlayerPanelWidgetType.ConfirmButtom,
         ]);
       } else {
         this._showWidgets([
-          WidgetType.AssociationCheckList,
-          WidgetType.AssociationInput,
+          PlayerPanelWidgetType.AssociationCheckList,
+          PlayerPanelWidgetType.AssociationInput,
         ]);
       }
     }
   }
 
-  private _showWidgets(widgets: WidgetType[]): void {
+  private _showWidgets(widgets: PlayerPanelWidgetType[]): void {
     const mapOptionToSubject = {
-      [WidgetType.AssociationCheckList]: this.showHints$,
-      [WidgetType.AssociationInput]: this.showAssociationInput$,
-      [WidgetType.AssociationText]: this.showAssociationText$,
-      [WidgetType.ConfirmButtom]: this.showConfirmBtn$,
-      [WidgetType.InfoMessage]: this.showInfoContainer$,
+      [PlayerPanelWidgetType.AssociationCheckList]: this.showHints$,
+      [PlayerPanelWidgetType.AssociationInput]: this.showAssociationInput$,
+      [PlayerPanelWidgetType.AssociationText]: this.showAssociationText$,
+      [PlayerPanelWidgetType.ConfirmButtom]: this.showConfirmBtn$,
+      [PlayerPanelWidgetType.InfoMessage]: this.showInfoContainer$,
     };
 
     Object.keys(mapOptionToSubject).forEach((key) => {
-      if (widgets.includes(key as WidgetType)) {
-        mapOptionToSubject[key as WidgetType].next(true);
+      if (widgets.includes(key as PlayerPanelWidgetType)) {
+        mapOptionToSubject[key as PlayerPanelWidgetType].next(true);
       } else {
-        mapOptionToSubject[key as WidgetType].next(false);
+        mapOptionToSubject[key as PlayerPanelWidgetType].next(false);
       }
     });
   }
@@ -307,4 +350,6 @@ export class GameRoomComponent implements OnInit {
         return null;
     }
   }
+
+  private _checkIsPlayersReady() {}
 }

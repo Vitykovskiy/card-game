@@ -8,4 +8,10 @@ import { Component, Input } from '@angular/core';
 export class CardComponent {
   @Input() url: string = '';
   @Input() selected = false;
+  @Input() isYourCard = false;
+  @Input() show = true;
+
+  get cardUrl() {
+    return 'https://game.ataman-club.ru' + this.url;
+  }
 }

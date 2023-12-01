@@ -9,7 +9,7 @@ import {
   IResultRoundData,
   ISelectedCards,
   IStartRoundData,
-  RoundDataTypes,
+  RoundDataTypes as RoundDataType,
   checkRoundDataType,
   transformCardsObjectToArray,
 } from '../interfaces/round.interfaces';
@@ -31,8 +31,6 @@ export class RoundStateManagerService implements OnInit {
   private _roundStep = new BehaviorSubject<RoundStep>(RoundStep.None);
 
   private _leader = new BehaviorSubject<number | null>(null);
-  private _leaderAssociationText = new BehaviorSubject<string | null>(null);
-  private _leaderAssociationCard = new BehaviorSubject<number | null>(null);
 
   private _associationText = new BehaviorSubject<string | null>(null);
 
@@ -56,7 +54,7 @@ export class RoundStateManagerService implements OnInit {
     this.onStartGame();
   }
 
-  public get roundStep(): Observable<RoundStep> {
+  public getRoundStepObservable(): Observable<RoundStep> {
     return this._roundStep.asObservable();
   }
 
@@ -64,7 +62,11 @@ export class RoundStateManagerService implements OnInit {
     this._roundStep.next(state);
   }
 
-  public get playerCards(): Observable<ICard[]> {
+  public get roundStep() {
+    return this._roundStep.getValue();
+  }
+
+  public getPlayerCardsObservable(): Observable<ICard[]> {
     return this._playerCards
       .asObservable()
       .pipe(map((value) => transformCardsObjectToArray(value)));
@@ -78,7 +80,7 @@ export class RoundStateManagerService implements OnInit {
     return this._leader.asObservable();
   }
 
-  public get tableCards(): Observable<ICard[]> {
+  public getTableCardsObservable(): Observable<ICard[]> {
     return this._tableCards.asObservable().pipe(
       map((value) => {
         if (!value) {
@@ -90,19 +92,15 @@ export class RoundStateManagerService implements OnInit {
     );
   }
 
-  public get players(): Observable<IPlayer[]> {
+  public getPlayersObservbale(): Observable<IPlayer[]> {
     return this._players.asObservable();
   }
 
-  public get associationText(): Observable<string | null> {
+  public getAssociationTextObservable(): Observable<string | null> {
     return this._associationText.asObservable();
   }
 
-  public set associationText(text: string) {
-    this._associationText.next(text);
-  }
-
-  public setGameStatusToPlaying() {
+  public changeGameStatusToPlaying() {
     this._requestService.emitMessage({
       game_status: GameStatus.Playing,
     });
@@ -114,27 +112,7 @@ export class RoundStateManagerService implements OnInit {
     });
   }
 
-  public selectCard(card: number) {
-    this._requestService.emitMessage({
-      association_card: card,
-    });
-  }
-
-  public setAssociationByLeader(card?: number, text?: string) {
-    const association = {} as any;
-    if (card) {
-      association.association_card = card;
-      this._leaderAssociationCard.next(card);
-    }
-    if (text) {
-      association.association_text = text;
-      this._leaderAssociationText.next(text);
-    }
-    this._requestService.emitMessage(association);
-  }
-
   // Round hooks
-
   public onStartGame(): void {
     this._websocketObservable = this._requestService.getWebsocketObservable();
     if (!this._websocketObservable) {
@@ -142,28 +120,39 @@ export class RoundStateManagerService implements OnInit {
     }
     this._websocketObservable.subscribe((data: any) => {
       switch (checkRoundDataType(data)) {
-        case RoundDataTypes.StartData:
+        case RoundDataType.StartData:
           this._onStartRound(data as IStartRoundData);
           this.roundStep = RoundStep.LeaderThinking;
           break;
-        case RoundDataTypes.AssociationReceived:
+        case RoundDataType.AssociationReceived:
           this._onAssociationReceived(data);
           this.roundStep = RoundStep.ChooseAssociationCard;
           break;
-        case RoundDataTypes.SelectedCardsData:
+        case RoundDataType.SelectedCardsData:
           this._onGetCards(data as ISelectedCards);
           this.roundStep = RoundStep.ChooseLeadersCard;
           break;
-        case RoundDataTypes.ResultData:
+        case RoundDataType.ResultData:
           this._onFinishRound(data as IResultRoundData);
           this.roundStep = RoundStep.RoundResults;
           break;
+        case RoundDataType.PlayersStatusData:
+          const players = this._players.getValue().map((playerData) => {
+            if (playerData.id) {
+              const newPlayersStatus = data[playerData.id];
+              if (newPlayersStatus !== undefined) {
+                playerData.status = newPlayersStatus;
+              }
+            }
+            return playerData;
+          });
+          this._players.next(players);
       }
     });
   }
 
   private _onStartRound(roundData: IStartRoundData) {
-    console.log('_onStartRound', roundData.leader_id);
+    this.roundStep = RoundStep.LeaderThinking;
     this._leader.next(roundData.leader_id);
     this._playerCards.next(roundData.player_cards);
     const players = Object.keys(roundData.players).map((id) => {

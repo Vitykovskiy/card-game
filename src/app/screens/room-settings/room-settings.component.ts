@@ -25,11 +25,7 @@ export class RoomSettingsComponent implements OnInit {
     private _router: Router,
   ) {}
 
-  ngOnInit() {
-    this._requestService.getDecksRequest().subscribe((data: any) => {
-      this._decks = data;
-    });
-  }
+  ngOnInit() {}
 
   setReadyStatus(): void {
     //  this._requestService.setReadyStatus();

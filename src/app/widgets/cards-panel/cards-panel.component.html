@@ -1,0 +1,17 @@
+<div *ngIf="cards" class="table-cards">
+  <card
+    *ngFor="let card of cards"
+    [url]="card.url"
+    [selected]="!!selectedCard && card.id !== selectedCard"
+    [isYourCard]="card.id === yourCardId"
+    (click)="onCardClick(card.id)"
+  ></card>
+</div>
+
+<div *ngIf="!cards" class="table-cards">
+  <card
+    *ngFor="let players of players; index as idx"
+    [url]="backOfCardUrl"
+    [show]="isCardPlaced(idx)"
+  ></card>
+</div>

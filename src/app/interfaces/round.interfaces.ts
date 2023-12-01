@@ -5,6 +5,7 @@ enum RoundDataTypes {
   StartData = 'start',
   SelectedCardsData = 'selected-cards',
   AssociationReceived = 'association',
+  PlayersStatusData = 'players-status',
 }
 
 interface IResultRoundData {
@@ -23,9 +24,9 @@ interface IStartRoundData {
 
 interface IPlayer {
   id?: string;
-  avatar: string;
-  status: PlayerStatus;
-  points: number;
+  avatar?: string;
+  status?: PlayerStatus;
+  points?: number;
 }
 
 interface ISelectedCards {
@@ -68,6 +69,24 @@ function isAssociationTextData(data: any): boolean {
   return 'association_text' in data;
 }
 
+function isPlayerStatusData(data: any): boolean {
+  if (typeof data !== 'object' || data === null) {
+    return false;
+  }
+
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof key !== 'string' || !/^(\d+)$/.test(key)) {
+      return false;
+    }
+
+    if (value !== PlayerStatus.Ready && value !== PlayerStatus.NotReady) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function checkRoundDataType(data: any): RoundDataTypes | null {
   if (isStartRoundData(data)) {
     return RoundDataTypes.StartData;
@@ -80,6 +99,9 @@ function checkRoundDataType(data: any): RoundDataTypes | null {
   }
   if (isSelectedCardsData(data)) {
     return RoundDataTypes.SelectedCardsData;
+  }
+  if (isPlayerStatusData(data)) {
+    return RoundDataTypes.PlayersStatusData;
   }
   return null;
 }
